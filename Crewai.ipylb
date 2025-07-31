@@ -1,0 +1,49 @@
+!pip install crewai openai langchain --quiet
+import os
+os.environ["OPENAI_API_KEY"] = "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"
+from crewai import Agent, Task, Crew
+
+# 1. Mood Analyzer Agent
+mood_analyzer = Agent(
+    role="Mood Analyzer",
+    goal="Analyze the user's text to determine emotional tone or mood",
+    backstory="You are a mood analysis expert trained in emotional AI. You detect user emotions from their messages.",
+    verbose=True,
+    allow_delegation=True
+)
+
+# 2. Companion Agent
+companion = Agent(
+    role="Companion",
+    goal="Provide supportive, empathetic responses to user’s emotional state",
+    backstory="You are a virtual friend who listens and supports users in emotional distress with empathy.",
+    verbose=True,
+    allow_delegation=True
+)
+
+# 3. Self-Care Recommender Agent
+selfcare_agent = Agent(
+    role="Self-Care Recommender",
+    goal="Suggest personalized mental wellness or self-care activities",
+    backstory="You are a wellness coach who recommends simple, effective self-care techniques based on user's mood.",
+    verbose=True,
+    allow_delegation=True
+)
+user_input = "I feel really tired and unmotivated lately. Everything feels dull."
+
+task = Task(
+    description=f"Analyze this text: '{user_input}' and respond with:\n"
+                "1. Mood detected\n"
+                "2. Supportive message\n"
+                "3. Self-care suggestion",
+    expected_output="A friendly response from all agents working together to support the user's mental state.",
+    agent=mood_analyzer
+)
+crew = Crew(
+    agents=[mood_analyzer, companion, selfcare_agent],
+    tasks=[task],
+    verbose=True
+)
+
+result = crew.kickoff()
+print("\n🤖 Final Response:\n", result)
