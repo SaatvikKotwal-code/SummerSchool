@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Chatbot | Together AI</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <h1>AI Chatbot (Together AI)</h1>
+
+  <div id="chat-box">
+    {% for message in history %}
+      <div><strong>🧑 You:</strong> {{ message.user }}</div>
+      <div><strong>🤖 AI:</strong> {{ message.bot }}</div>
+    {% endfor %}
+  </div>
+
+  <div id="input-section">
+    <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <form action="/clear" method="get" style="margin-top: 20px;">
+    <button type="submit">🗑️ Clear Chat</button>
+  </form>
+
+  <script>
+    const input = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
+
+    // Send message on Enter key press
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        event.preventDefault();  // Prevent form submit if any
+        sendMessage();
+      }
+    });
+
+    async function sendMessage() {
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Show user message
+      const userMessage = document.createElement("div");
+      userMessage.innerHTML = `<strong>🧑 You:</strong> ${message}`;
+      chatBox.appendChild(userMessage);
+      chatBox.scrollTop = chatBox.scrollHeight;
+      input.value = "";
+
+      // Show "Bot is typing..." message
+      const typingMsg = document.createElement("div");
+      typingMsg.id = "typing";
+      typingMsg.innerHTML = `<strong>🤖 AI:</strong> <em>Bot is typing...</em>`;
+      chatBox.appendChild(typingMsg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      // Call backend
+      const res = await fetch("/api", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+
+      // Replace typing message with actual reply
+      typingMsg.innerHTML = `<strong>🤖 AI:</strong> ${data.reply}`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>

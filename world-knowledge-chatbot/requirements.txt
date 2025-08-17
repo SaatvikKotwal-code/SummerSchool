@@ -1,0 +1,3 @@
+flask
+requests
+tgp_v1_irCLU1AW7N9Vj8CpZH18a8Ixdp5NsNhSVNjC-V48TLU
